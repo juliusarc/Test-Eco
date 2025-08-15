@@ -149,9 +149,7 @@ def inserir_dependente(dados: Dict[str, str]) -> None:
     finally:
         conn.close()
 
-# -------------------------
 # Operações gerais
-# -------------------------
 def remover_pessoa(cpf: str) -> None:
     """Remove uma pessoa (titular ou dependente) do banco de dados."""
     if not cpf_valido(cpf):
@@ -213,9 +211,7 @@ def listar_pessoas() -> None:
     finally:
         conn.close()
 
-# -------------------------
-# Exemplo de uso
-# -------------------------
+# Testando as funcionalidades
 if __name__ == "__main__":
     # Cria as tabelas
     criar_tabelas()
@@ -252,7 +248,7 @@ if __name__ == "__main__":
         'idade': 13,
         'faixa_ans': 'Infantil',
         'estado_civil': 'Solteiro',
-        'grau_parentesco': 'Filha',
+        'grau_parentesco': 'Prima',
         'tipo_suplementar': 'Ouro',
         'cpf_titular': '12930888466',  
         'status': 'Ativo',
