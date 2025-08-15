@@ -4,15 +4,13 @@ from typing import Dict, Optional
 
 DB_NAME = "ECO.db"
 
-# Criar tabelas com relacionamentos
 
 def criar_tabelas():
-    """Cria as tabelas Titulares e Dependentes no banco de dados."""
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         
-        # Tabela de Titulares
+        # Tabela Titulares
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS Titulares (
             CPF TEXT PRIMARY KEY,
@@ -34,7 +32,7 @@ def criar_tabelas():
         )
         """)
         
-        # Tabela de Dependentes
+        # Tabela Dependentes
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS Dependentes (
             CPF TEXT PRIMARY KEY,
@@ -62,19 +60,17 @@ def criar_tabelas():
     finally:
         conn.close()
 
-# -------------------------
-# Funções de validação
-# -------------------------
-def cpf_valido(cpf: str) -> bool:
-    """Valida se um CPF tem 11 dígitos numéricos."""
-    return bool(re.fullmatch(r"\d{11}", cpf))
 
-# Operações com Titulares
+
+
+def cpf_valido(cpf: str) -> bool:
+    
+    return bool(re.fullmatch(r"\d{11}", cpf))
 
 
 
 def inserir_titular(dados: Dict[str, str]) -> None:
-    """Insere um novo titular no banco de dados."""
+  
     if not cpf_valido(dados['cpf']):
         print(f"CPF inválido: {dados['cpf']}")
         return
@@ -105,10 +101,10 @@ def inserir_titular(dados: Dict[str, str]) -> None:
     finally:
         conn.close()
 
-# Operações com Dependentes
+
 
 def inserir_dependente(dados: Dict[str, str]) -> None:
-    """Insere um novo dependente no banco de dados."""
+  
     if not cpf_valido(dados['cpf']):
         print(f"CPF inválido do dependente: {dados['cpf']}")
         return
@@ -121,13 +117,17 @@ def inserir_dependente(dados: Dict[str, str]) -> None:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
 
-        # Verifica se titular existe
+
+
+     
         cursor.execute("SELECT 1 FROM Titulares WHERE CPF = ?", (dados['cpf_titular'],))
         if not cursor.fetchone():
             print(f"Erro: Titular com CPF {dados['cpf_titular']} não encontrado.")
             return
         
-        # Insere o dependente
+
+
+      
         cursor.execute("""
         INSERT INTO Dependentes (
             CPF, Credencial, Nome, Sexo, DtNascimento, Idade, FaixaANS, EstadoCivil,
@@ -149,9 +149,14 @@ def inserir_dependente(dados: Dict[str, str]) -> None:
     finally:
         conn.close()
 
-# Operações gerais
+
+
+
+
+
+
 def remover_pessoa(cpf: str) -> None:
-    """Remove uma pessoa (titular ou dependente) do banco de dados."""
+    """Remove uma pessoa (titular ou dependente)"""
     if not cpf_valido(cpf):
         print(f"CPF inválido: {cpf}")
         return
@@ -160,13 +165,13 @@ def remover_pessoa(cpf: str) -> None:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         
-        # Verifica se é titular
+      
         cursor.execute("SELECT 1 FROM Titulares WHERE CPF = ?", (cpf,))
         if cursor.fetchone():
             cursor.execute("DELETE FROM Titulares WHERE CPF = ?", (cpf,))
             print(f"Titular com CPF {cpf} e seus dependentes foram removidos com sucesso!")
         else:
-            # Se não for titular, tenta remover como dependente
+           
             cursor.execute("DELETE FROM Dependentes WHERE CPF = ?", (cpf,))
             if cursor.rowcount > 0:
                 print(f"Dependente com CPF {cpf} removido com sucesso!")
@@ -180,7 +185,7 @@ def remover_pessoa(cpf: str) -> None:
         conn.close()
 
 def listar_pessoas() -> None:
-    """Lista todos os titulares e dependentes do banco de dados."""
+    
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
@@ -211,12 +216,12 @@ def listar_pessoas() -> None:
     finally:
         conn.close()
 
-# Testando as funcionalidades
+
+
 if __name__ == "__main__":
-    # Cria as tabelas
     criar_tabelas()
 
-    # Dados do titular
+
     dados_titular = {
         'cpf': '12930888466',
         'credencial': 'CRED001',
@@ -238,7 +243,6 @@ if __name__ == "__main__":
     
     inserir_titular(dados_titular)
 
-    # Dados do dependente
     dados_dependente = {
         'cpf': '21223344556',
         'credencial': 'CRED002',
@@ -256,22 +260,21 @@ if __name__ == "__main__":
         'data_fim': None
     }
     
-    # Insere o dependente
+
     inserir_dependente(dados_dependente)
 
-    # Lista todas as pessoas
+
     listar_pessoas()
 
-    # Remove o dependente
+
     remover_pessoa('21223344556')
 
-    # Lista novamente para verificar
+
     listar_pessoas()
 
-    # Remove o titular (deve remover automaticamente todos os dependentes restantes)
+   
     remover_pessoa('12930888466')
 
-    # Lista final
     listar_pessoas()
 
 
